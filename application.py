@@ -18,8 +18,10 @@ def create_app(**config_overrides):
 
     # import blueprints
     from home.views import home_app
+    from bucketlist.views import bucketlist_app
 
     # register blueprints
     app.register_blueprint(home_app)
+    app.register_blueprint(bucketlist_app)
 
     return app
