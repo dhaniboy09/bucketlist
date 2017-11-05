@@ -1,8 +1,11 @@
 from flask.views import MethodView
 from flask import jsonify, request, abort
+from app.decorators import app_required
 
 
 class BucketListAPI(MethodView):
+    decorators = [app_required]
+
     items = [
         {"id": 1, "name": u"Mac", "links": [{"rel": "self", "href": "/items/1"}]},
         {"id": 2, "name": u"Leo", "links": [{"rel": "self", "href": "/items/2"}]},
