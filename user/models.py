@@ -8,7 +8,7 @@ class User(db.Document):
     last_name = db.StringField(db_field="ln")
     email = db.StringField(db_field="e")
     password = db.StringField(db_field="p")
-    live = db.Boolean(db_field="l", default=True)
+    live = db.BooleanField(db_field="l", default=True)
 
     meta = {
         'indexes': [('external_id', 'live')]

@@ -8,7 +8,7 @@ from jsonschema.exceptions import best_match
 
 from app.decorators import app_required
 from user.models import User
-from user.schema import schema
+from user.schema import schema, update_schema
 from user.templates import user_obj, users_obj
 
 
@@ -67,7 +67,7 @@ class UserAPI(MethodView):
         if not user:
             return jsonify({}), 404
         user_json = request.json
-        error = best_match(Draft4Validator(schema).iter_errors(user_json))
+        error = best_match(Draft4Validator(update_schema).iter_errors(user_json))
         if error:
             return jsonify({"error": error.message}), 400
         else:
@@ -88,4 +88,3 @@ class UserAPI(MethodView):
         user.live = False
         user.save()
         return jsonify({}), 204
-    
