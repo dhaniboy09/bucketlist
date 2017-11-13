@@ -12,5 +12,7 @@ def user_obj(user):
 
 
 def users_obj(users):
-    users = []
-    return users
+    users_obj = []
+    for user in users.items:
+        users_obj.append(user_obj(user))
+    return users_obj

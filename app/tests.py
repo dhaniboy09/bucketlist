@@ -35,36 +35,26 @@ class AppTest(unittest.TestCase):
 
     def test_create_app(self):
         # basic registration
-        rv = self.app.post('/apps/',
-                           data=self.app_dict(),
-                           content_type='application/json')
+        rv = self.app.post
         assert rv.status_code == 200
 
         # missing app_secret
         missing_app_dict = json.dumps(dict(
             app_id="bucketlist_client"
         ))
-        rv = self.app.post('/apps/',
-                           data=missing_app_dict,
-                           content_type='application/json')
+        rv = self.app.post
         assert "MISSING_APP_ID_OR_APP_SECRET" in str(rv.data)
 
         # repeat registration
-        rv = self.app.post('/apps/',
-                           data=self.app_dict(),
-                           content_type='application/json')
+        rv = self.app.post
         assert "APP_ID_ALREADY_EXISTS" in str(rv.data)
 
     def test_token_generation(self):
-        rv = self.app.post('/apps/',
-                           data=self.app_dict(),
-                           content_type='application/json')
+        rv = self.app.post
         assert rv.status_code == 200
 
         # generate access token
-        rv = self.app.post('/apps/access_token/',
-                           data=self.app_dict(),
-                           content_type='application/json')
+        rv = self.app.post
         token = json.loads(rv.data.decode('utf-8')).get('token')
         assert token is not None
 
@@ -72,9 +62,7 @@ class AppTest(unittest.TestCase):
         missing_app_dict = json.dumps(dict(
             app_id="bucketlist_client"
         ))
-        rv = self.app.post('/apps/access_token/',
-                           data=missing_app_dict,
-                           content_type='application/json')
+        rv = self.app.post
         assert "MISSING_APP_ID_OR_APP_SECRET" in str(rv.data)
 
         # incorrect app_secret
@@ -82,9 +70,7 @@ class AppTest(unittest.TestCase):
             app_id="bucketlist_client",
             app_secret="bad_bucketlist_secret"
         ))
-        rv = self.app.post('/apps/access_token/',
-                           data=missing_app_dict,
-                           content_type='application/json')
+        rv = self.app.post
         assert "INCORRECT_CREDENTIALS" in str(rv.data)
 
         # test that token works
