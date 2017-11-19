@@ -8,13 +8,21 @@ from jsonschema import Draft4Validator
 from jsonschema.exceptions import best_match
 from mongoengine import NotUniqueError
 from datetime import datetime, timedelta
-
+from json import JSONEncoder
 from app.decorators import app_required
 from user.decorators import user_required
 from user.models import User
+from bucketlist.models import Bucketlist
+from bucketlist.templates import bucketlist_objs
 from user.schema import schema, update_schema, password_schema
-from user.templates import user_obj, users_obj
+from user.templates import user_obj, users_obj, profile_user_obj
 from user.helpers import encode_jwt_token
+from user.helpers import decode_jwt_token
+
+
+class MyEncoder(JSONEncoder):
+    def default(self, o):
+        return o.__dict__
 
 
 class UserAPI(MethodView):
@@ -22,26 +30,62 @@ class UserAPI(MethodView):
 
     def __init__(self):
         self.USERS_PER_PAGE = 10
+        self.ITEMS_PER_PAGE = 10
         # If it's a POST or PUT request, it must come with a payload
         if (request.method != 'GET' and request.method != 'DELETE') and not request.json:
             abort(400)
 
     def get(self, user_id):
         if user_id:
+            user_token = request.headers.get('X-USER-TOKEN')
+            user_token_id = decode_jwt_token(user_token)
             user = User.objects.filter(external_id=user_id, live=True).first()
             if user:
-                response = {
-                    "result": "ok",
-                    "user": user_obj(user)
-                }
-                return jsonify(response), 200
+                if "items" in request.url:
+                    bucketlist_items = Bucketlist.objects.filter(user=user, live=True)
+                    print(bucketlist_items)
+                    page = int(request.args.get('page', 1))
+                    bucketlist_items = bucketlist_items.paginate(page=page, per_page=self.ITEMS_PER_PAGE)
+                    # print(json.dumps(bucketlist_items, default=serialize), 'DUMP 2')
+                    response = {
+                        "result": "ok",
+                        "links": [
+                            {
+                                "href": "/users/%s/items/?page=%s" % (user_id, page),
+                                "rel": "self"
+                            }
+                        ],
+                        "bucketlist_items": bucketlist_objs(bucketlist_items)
+                    }
+                    if bucketlist_items.has_prev:
+                        response["links"].append({
+                            "href": "/users/%s/items/?page=%s" % (user_id, bucketlist_items.prev_num),
+                            "rel": "previous"
+                        })
+                    if bucketlist_items.has_next:
+                        response["links"].append({
+                            "href": "/users/%s/items/?page=%s" % (user_id, bucketlist_items.next_num),
+                            "rel": "next"
+                        })
+                        return jsonify(response), 200
+                if user_id == user_token_id:
+                    response = {
+                        "result": "ok",
+                        "user": user_obj(user)
+                    }
+                    return jsonify(response), 200
+                else:
+                    response = {
+                        "result": "ok",
+                        "user": profile_user_obj(user)
+                    }
+                    return jsonify(response), 200
             else:
                 return jsonify({}), 404
         else:
             users = User.objects.filter(live=True)
             page = int(request.args.get('page', 1))
             users = users.paginate(page=page, per_page=self.USERS_PER_PAGE)
-            print(users.items)
             response = {
                 "result": "ok",
                 "links": [
@@ -63,7 +107,7 @@ class UserAPI(MethodView):
                 response["links"].append(
                     {
                         "href": "/users/?page=%s" % (users.next_num),
-                        "rel": "previous"
+                        "rel": "next"
                     }
                 )
             return jsonify(response), 200
@@ -73,44 +117,58 @@ class UserAPI(MethodView):
         if not user:
             return jsonify({}), 404
         user_json = request.json
-        if user_json.get('password'):
-            error = best_match(Draft4Validator(password_schema).iter_errors(user_json))
-            if error:
-                return jsonify({"error": error.message}), 400
-            else:
-                salt = bcrypt.gensalt()
-                hashed_password = bcrypt.hashpw(user_json.get('password'), salt)
-                user.password = hashed_password
-                user.save()
-                response = {
-                    "result": "ok"
-                }
-                return jsonify(response), 200
-        else:
-            try:
-                error = best_match(Draft4Validator(update_schema).iter_errors(user_json))
+        user_token = request.headers.get('X-USER-TOKEN')
+        user_token_id = decode_jwt_token(user_token)
+        if user_token_id == user_id:
+            if user_json.get('password'):
+                error = best_match(Draft4Validator(password_schema).iter_errors(user_json))
                 if error:
                     return jsonify({"error": error.message}), 400
                 else:
-                    user.first_name = user_json.get('first_name')
-                    user.last_name = user_json.get('last_name')
-                    user.email = user_json.get('email')
+                    salt = bcrypt.gensalt()
+                    hashed_password = bcrypt.hashpw(user_json.get('password'), salt)
+                    user.password = hashed_password
                     user.save()
                     response = {
-                        "result": "ok",
-                        "user": user_obj(user)
+                        "result": "ok"
                     }
                     return jsonify(response), 200
-            except NotUniqueError:
-                return jsonify({"error": "Email already in use"}), 400
+            else:
+                try:
+                    error = best_match(Draft4Validator(update_schema).iter_errors(user_json))
+                    if error:
+                        return jsonify({"error": error.message}), 400
+                    else:
+                        user.first_name = user_json.get('first_name')
+                        user.last_name = user_json.get('last_name')
+                        user.email = user_json.get('email')
+                        user.save()
+                        response = {
+                            "result": "ok",
+                            "user": user_obj(user)
+                        }
+                        return jsonify(response), 200
+                except NotUniqueError:
+                    return jsonify({"error": "Email already in use"}), 400
+        else:
+            response = {
+                "status": "fail",
+                "message": "Unauthorized to edit"
+            }
+            return jsonify(response), 403
 
     def delete(self, user_id):
         user = User.objects.filter(external_id=user_id, live=True).first()
         if not user:
             return jsonify({}), 404
-        user.live = False
-        user.save()
-        return jsonify({}), 204
+        user_token = request.headers.get('X-USER-TOKEN')
+        user_token_id = decode_jwt_token(user_token)
+        if user_token_id == user_id:
+            user.live = False
+            user.save()
+            return jsonify({}), 204
+        else:
+            return jsonify({}), 403
 
 
 class UserLoginView(MethodView):
@@ -135,7 +193,7 @@ class UserLoginView(MethodView):
                 "status": "fail",
                 "message": "User does not exist"
             }
-            return jsonify({'response': response}), 400
+            return jsonify(response), 400
         else:
             # check that the passwords match
             if bcrypt.hashpw(user_json.get('password'), user.password) == user.password:
@@ -146,13 +204,13 @@ class UserLoginView(MethodView):
                     "message": "Login successful",
                     "token": user_token.decode()
                 }
-                return jsonify({'response': response}), 200
+                return jsonify(response), 200
             else:
                 response = {
                     "status": "fail",
                     "message": "Incorrect Password"
                 }
-                return jsonify({'response': response}), 400
+                return jsonify(response), 400
 
 
 class UserSignUpView(MethodView):
