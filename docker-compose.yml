@@ -1,7 +1,9 @@
 version: '2'
 services:
   web:
-    build: .
+    build:
+      context: ./api
+      dockerfile: Dockerfile
     ports:
       - "80:5000"
     volumes:
@@ -12,3 +14,14 @@ services:
   db:
     image: mongo:3.0.2
     container_name: bucketlistapi_db_1
+#  client:
+#    build:
+#      context: ./client
+#      dockerfile: Dockerfile.client
+#    container_name: bucketlist_client_1
+#    depends_on:
+#      - web
+#    ports:
+#      - "3000:3000"
+#    volumes:
+#      -

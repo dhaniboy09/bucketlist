@@ -1,0 +1,16 @@
+FROM node:7.8.0
+
+# Get some custom packages
+RUN apt-get update && apt-get install -y \
+    curl -sL https://deb.nodesource.com/setup_7.x | bash -
+
+ADD client/package.json /tmp/package.json
+RUN cd /tmp && npm install
+
+ADD . /app/
+RUN cp -a /tmp/node_modules /app/
+WORKDIR /app
+
+VOLUME  ["/app"]
+
+CMD npm start
