@@ -1,12 +1,12 @@
-from application import create_app as create_app_base
+from api.application import create_app as create_app_base
 from mongoengine.connection import _get_db
 import unittest
 import json
 from datetime import datetime
 
-from settings import MONGODB_HOST, MONGODB_DB
-from bucketlist.models import Bucketlist
-from application import fixtures
+from api.settings import MONGODB_HOST, MONGODB_DB
+from api.bucketlist.models import Bucketlist
+from api.application import fixtures
 
 
 class BucketlistTest(unittest.TestCase):

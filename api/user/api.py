@@ -8,21 +8,16 @@ from jsonschema import Draft4Validator
 from jsonschema.exceptions import best_match
 from mongoengine import NotUniqueError
 from datetime import datetime, timedelta
-from json import JSONEncoder
-from app.decorators import app_required
-from user.decorators import user_required
-from user.models import User
-from bucketlist.models import Bucketlist
-from bucketlist.templates import bucketlist_objs
-from user.schema import schema, update_schema, password_schema
-from user.templates import user_obj, users_obj, profile_user_obj
-from user.helpers import encode_jwt_token
-from user.helpers import decode_jwt_token
 
-
-class MyEncoder(JSONEncoder):
-    def default(self, o):
-        return o.__dict__
+from api.app.decorators import app_required
+from api.user.decorators import user_required
+from api.user.models import User
+from api.bucketlist.models import Bucketlist
+from api.bucketlist.templates import bucketlist_objs
+from api.user.schema import schema, update_schema, password_schema
+from api.user.templates import user_obj, users_obj, profile_user_obj
+from api.user.helpers import encode_jwt_token
+from api.user.helpers import decode_jwt_token
 
 
 class UserAPI(MethodView):

@@ -4,7 +4,7 @@ import bcrypt
 import uuid
 from datetime import datetime, timedelta
 
-from app.models import App, Access
+from api.app.models import App, Access
 
 
 class AppAPI(MethodView):

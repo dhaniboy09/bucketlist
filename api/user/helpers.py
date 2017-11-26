@@ -1,6 +1,6 @@
 import jwt
 from datetime import datetime, timedelta
-from settings import SECRET_KEY
+from api.settings import SECRET_KEY
 
 
 def encode_jwt_token(user_id):

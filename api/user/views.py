@@ -1,6 +1,6 @@
 from flask import Blueprint
 
-from user.api import UserAPI, UserLoginView, UserSignUpView
+from api.user.api import UserAPI, UserLoginView, UserSignUpView
 
 user_app = Blueprint('user_app', __name__)
 

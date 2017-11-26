@@ -15,12 +15,12 @@ RUN apt-get update && apt-get install -y \
     mongodb
 
 ## make a local directory
-RUN mkdir -p /Users/dhani/dev/bucketlist
+RUN mkdir -p /bucketlist
 
 # set "bucketlist" as the working directory from which CMD, RUN, ADD references
-WORKDIR /Users/dhani/dev/bucketlist
+WORKDIR /bucketlist
 
-# now copy all the files in this directory to /code
+# now copy all the files in this directory to
 ADD . .
 
 # pip install the local requirements.txt
@@ -30,4 +30,4 @@ RUN pip install -r requirements.txt
 EXPOSE 5000
 
 # start the app server
-CMD python manage.py runserver
+CMD python /bucketlist/api/manage.py runserver

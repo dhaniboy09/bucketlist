@@ -3,9 +3,9 @@ from mongoengine.connection import _get_db
 import unittest
 import json
 
-from settings import MONGODB_HOST, MONGODB_DB
-from user.models import User
-from application import fixtures
+from api.settings import MONGODB_HOST, MONGODB_DB
+from api.user.models import User
+from api.application import fixtures
 
 
 class UserTest(unittest.TestCase):

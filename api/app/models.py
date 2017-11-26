@@ -1,4 +1,4 @@
-from application import db
+from api.application import db
 
 
 class App(db.Document):

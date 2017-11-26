@@ -7,21 +7,21 @@ services:
     ports:
       - "80:5000"
     volumes:
-      - /Users/dhani/dev/bucketlist:/Users/dhani/dev/bucketlist
+      - /Users/dhani/dev/bucketlist:/bucketlist
     links:
       - db:mongodb
     container_name: bucketlistapi_web_1
   db:
     image: mongo:3.0.2
     container_name: bucketlistapi_db_1
-#  client:
-#    build:
-#      context: ./client
-#      dockerfile: Dockerfile.client
-#    container_name: bucketlist_client_1
-#    depends_on:
-#      - web
-#    ports:
-#      - "3000:3000"
-#    volumes:
-#      -
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.client
+    container_name: bucketlist_client_1
+    depends_on:
+      - web
+    ports:
+      - "3000:3000"
+    volumes:
+      - /Users/dhani/dev/bucketlist:/bucketlist/client

@@ -2,7 +2,7 @@ from flask import Flask
 from flask_mongoengine import MongoEngine
 from subprocess import call
 
-from settings import MONGODB_HOST
+from api.settings import MONGODB_HOST
 
 db = MongoEngine()
 
@@ -20,10 +20,10 @@ def create_app(**config_overrides):
     db.init_app(app)
 
     # import blueprints
-    from home.views import home_app
-    from bucketlist.views import bucketlist_app
-    from app.views import app_app
-    from user.views import user_app
+    from api.home.views import home_app
+    from api.bucketlist.views import bucketlist_app
+    from api.app.views import app_app
+    from api.user.views import user_app
 
     # register blueprints
     app.register_blueprint(home_app)

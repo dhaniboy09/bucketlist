@@ -2,7 +2,7 @@ from functools import wraps
 from flask import request, jsonify
 import datetime
 
-from app.models import App, Access
+from api.app.models import App, Access
 
 
 def app_required(f):

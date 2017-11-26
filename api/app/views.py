@@ -1,6 +1,6 @@
 from flask import Blueprint
 
-from app.api import AppAPI, AccessAPI
+from api.app.api import AppAPI, AccessAPI
 
 app_app = Blueprint('app_app', __name__)
 

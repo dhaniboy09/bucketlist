@@ -2,8 +2,8 @@ from functools import wraps
 from flask import request, jsonify
 from datetime import datetime
 
-from user.models import User
-from user.helpers import decode_jwt_token
+from api.user.models import User
+from api.user.helpers import decode_jwt_token
 
 
 def user_required(f):

@@ -1,16 +1,56 @@
-FROM node:7.8.0
+# Get a node base image
+FROM node
 
-# Get some custom packages
-RUN apt-get update && apt-get install -y \
-    curl -sL https://deb.nodesource.com/setup_7.x | bash -
+# Reduce docker build messages
+ENV NPM_CONFIG_LOGLEVEL warn
 
-ADD client/package.json /tmp/package.json
-RUN cd /tmp && npm install
+# Create an app_env variable that sets
+# environment to production or development
+ARG app_env
+ENV APP_ENV $app_env
 
-ADD . /app/
-RUN cp -a /tmp/node_modules /app/
-WORKDIR /app
+# Create a directory in the container for the project files
+RUN mkdir -p /client
 
-VOLUME  ["/app"]
+# Set that as the working directory
+WORKDIR /client
 
-CMD npm start
+# copy files from the local project directory
+# into the container directory
+# 'copy dest src'
+COPY ./client ./client
+
+# Install all packages
+RUN npm install
+
+# If the environment is production then
+# run the the build script else run npm start
+CMD if [ ${APP_ENV} = production ]; \
+	then \
+	npm install -g http-server && \
+	npm run build && \
+	cd build && \
+	hs -p 3000; \
+	else \
+	npm run start; \
+	fi
+
+EXPOSE 3000
+
+
+#FROM node:7.8.0
+#
+## Get some custom packages
+#RUN apt-get update && apt-get install -y \
+#    curl -sL https://deb.nodesource.com/setup_7.x | bash -
+#
+#ADD client/package.json /tmp/package.json
+#RUN cd /tmp && npm install
+#
+#ADD . /app/
+#RUN cp -a /tmp/node_modules /app/
+#WORKDIR /app
+#
+#VOLUME  ["/app"]
+#
+#CMD npm start

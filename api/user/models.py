@@ -1,5 +1,5 @@
 from mongoengine import signals
-from application import db
+from api.application import db
 
 
 class User(db.Document):

@@ -1,11 +1,11 @@
-from application import create_app as create_app_base
+from api.application import create_app as create_app_base
 from mongoengine.connection import _get_db
 import unittest
 import json
 from datetime import datetime, timedelta
 
-from app.models import App, Access
-from settings import MONGODB_HOST
+from api.app.models import App, Access
+from api.settings import MONGODB_HOST
 
 
 class AppTest(unittest.TestCase):

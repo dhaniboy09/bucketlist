@@ -1,5 +1,5 @@
-from application import db
-from user.models import User
+from api.application import db
+from api.user.models import User
 
 
 class Bucketlist(db.Document):

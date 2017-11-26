@@ -1,6 +1,6 @@
 from flask import Blueprint
 
-from bucketlist.api import BucketlistAPI
+from api.bucketlist.api import BucketlistAPI
 
 bucketlist_app = Blueprint('bucketlist_app', __name__)
 

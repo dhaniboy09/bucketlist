@@ -1,4 +1,4 @@
-from user.templates import profile_user_obj
+from api.user.templates import profile_user_obj
 
 
 def bucketlist_obj(bucketlist_item):

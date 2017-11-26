@@ -6,13 +6,13 @@ import uuid
 import json
 import datetime
 
-from app.decorators import app_required
-from user.decorators import user_required
-from user.helpers import decode_jwt_token
-from bucketlist.models import Bucketlist
-from bucketlist.schema import schema
-from bucketlist.templates import bucketlist_obj, bucketlist_objs
-from user.models import User
+from api.app.decorators import app_required
+from api.user.decorators import user_required
+from api.user.helpers import decode_jwt_token
+from api.bucketlist.models import Bucketlist
+from api.bucketlist.schema import schema
+from api.bucketlist.templates import bucketlist_obj, bucketlist_objs
+from api.user.models import User
 
 
 class BucketlistAPI(MethodView):
