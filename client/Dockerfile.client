@@ -17,8 +17,8 @@ WORKDIR /client
 
 # copy files from the local project directory
 # into the container directory
-# 'copy dest src'
-COPY ./client ./client
+# 'copy source destination'
+COPY . /client
 
 # Install all packages
 RUN npm install
@@ -32,7 +32,7 @@ CMD if [ ${APP_ENV} = production ]; \
 	cd build && \
 	hs -p 3000; \
 	else \
-	npm run start; \
+	npm run watch; \
 	fi
 
 EXPOSE 3000
